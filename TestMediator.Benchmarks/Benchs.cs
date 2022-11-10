@@ -13,13 +13,15 @@ public class Benchs
     public Benchs()
     {
         var oldServiceColl = new ServiceCollection();
-        oldServiceColl.AddMediatR(config => config.AsTransient(),
+        oldServiceColl.AddMediatR(config => config.AsSingleton(),
             typeof(TestMediator.CurrentMediatR.Weather.WeatherForecast));
+        oldServiceColl.AddScoped<TestMediator.CurrentMediatR.DataService>();
         var oldProvider = oldServiceColl.BuildServiceProvider();
         _mediatr = oldProvider.GetRequiredService<IMediator>();
 
         var newServiceCollection = new ServiceCollection();
-        newServiceCollection.AddMediator();
+        newServiceCollection.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Singleton);
+        newServiceCollection.AddScoped<TestMediator.NewMediator.DataService>();
         var newProvider = newServiceCollection.BuildServiceProvider();
         _mediator = newProvider.GetRequiredService<global::Mediator.IMediator>();
     }
